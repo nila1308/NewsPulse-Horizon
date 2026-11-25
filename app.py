@@ -3,11 +3,11 @@ from functools import wraps
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 from pathlib import Path
-import requests, csv, io, json, re, time
+import requests, csv, io, json, re, time, os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from bs4 import BeautifulSoup
 from config import Config
-from storage import load_json, save_json
+from storage import load_json, save_json, initialize_database
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -17,6 +17,8 @@ def inject_site_helpers():
     return {"reading_time": reading_time, "load_notification_badge": len(load_notifications()) if session.get("logged_in") else 0}
 DATA_DIR = Path("data")
 DATA_DIR.mkdir(exist_ok=True)
+# In Vercel, persist app state in PostgreSQL and seed it from bundled JSON once.
+initialize_database(DATA_DIR)
 
 CATEGORIES = ["Sports", "Entertainment", "Education", "Technology", "Business", "Science", "Health"]
 CATEGORY_QUERIES = {
@@ -157,9 +159,11 @@ def _publisher_image(url):
     return ""
 
 def _cache_remote_image(image_url, article_key):
-    """Download a publisher image into static storage so cards do not rely on hotlinks."""
+    """Cache locally in development; use the publisher URL on read-only serverless hosts."""
     if not image_url or not image_url.startswith(("https://", "http://")):
         return ""
+    if os.environ.get("VERCEL"):
+        return image_url
     import hashlib
     try:
         response = requests.get(image_url, headers=HEADERS, timeout=(3, 5), stream=True, allow_redirects=True)
@@ -231,7 +235,7 @@ def _finish_article_image(article):
         image = _publisher_image(article.get("url", ""))
     if image.startswith(("https://", "http://")):
         image = _cache_remote_image(image, article.get("id", "")) or ""
-    if not image.startswith("/static/"):
+    if not image.startswith(("/static/", "https://", "http://")):
         image = CATEGORY_INFO.get(article.get("category"), {}).get(
             "image", "/static/images/image-unavailable.svg")
     article["image"] = image

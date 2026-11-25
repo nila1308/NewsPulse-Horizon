@@ -43,3 +43,22 @@ Keep the PowerShell window open while using the local site. The app stores bookm
 - Responsive layouts, hover polish and back-to-top control.
 
 Existing 68-article edition, article content, publisher links, local image assets, category pages, login, bookmarks, exports, search and theme toggle are retained. Reading history and notifications are stored locally in `data/reading_history.json` and `data/notifications.json`.
+
+## Deploying to Vercel with PostgreSQL
+
+The application can use PostgreSQL for persistent state when `DATABASE_URL` is
+configured. Create a PostgreSQL database (for example, a Neon project), then add
+these environment variables to the Vercel project:
+
+- `DATABASE_URL`: the provider's PostgreSQL connection string (use its pooled
+  connection string if the provider recommends one for serverless applications).
+- `NEWS_PULSE_SECRET`: a long, random secret used to sign Flask sessions.
+- `NEWS_PULSE_USERNAME`: the login name for the deployed instance.
+- `NEWS_PULSE_PASSWORD`: a strong password for the deployed instance.
+
+Do not commit these values to GitHub or paste them into public messages. On the
+first application startup, the app creates its PostgreSQL state table and seeds
+it from the bundled JSON files if the corresponding database keys do not exist.
+When `DATABASE_URL` is absent, local development continues to use the `data/`
+JSON files. Vercel's local filesystem is temporary; runtime-downloaded publisher
+images are therefore referenced by URL rather than treated as permanent files.

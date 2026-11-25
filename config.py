@@ -1,5 +1,6 @@
 import os
+
 class Config:
-    SECRET_KEY = os.environ.get("NEWS_PULSE_SECRET", "newspulse-demo-secret-change-before-deployment")
-    DEMO_USERNAME = "user"
-    DEMO_PASSWORD = "user123"
+    SECRET_KEY = os.environ.get("NEWS_PULSE_SECRET", "newspulse-local-development-key")
+    DEMO_USERNAME = os.environ.get("NEWS_PULSE_USERNAME", "user")
+    DEMO_PASSWORD = os.environ.get("NEWS_PULSE_PASSWORD", "user123")
