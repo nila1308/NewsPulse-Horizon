@@ -1,0 +1,18 @@
+{
+  "edition": "NewsPulse Horizon — 68 Article Reading Edition",
+  "total_articles": 68,
+  "categories": {
+    "Sports": 10,
+    "Entertainment": 10,
+    "Education": 10,
+    "Technology": 10,
+    "Business": 10,
+    "Science": 9,
+    "Health": 9
+  },
+  "full_text_articles": 60,
+  "full_text_selection": "60 original NewsPulse editorial explainers, with at least one per category",
+  "image_assets": "68 unique locally stored article images",
+  "content_notice": "60 original educational/editorial explainers created for this demonstration edition; 8 articles link to the original publisher. Publisher articles are not reproduced.",
+  "external_link_articles": 8
+}

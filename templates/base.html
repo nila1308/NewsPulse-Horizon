@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}NewsPulse Horizon{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+{% if session.get('logged_in') %}
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">N</span><span>News<span class="brand-accent">Pulse</span><small>YOUR DAILY BRIEFING</small></span></a>
+    <div class="nav-label">WORKSPACE</div>
+    <a class="nav-link {% if request.endpoint == 'dashboard' and request.args.get('category', 'All') == 'All' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span>⌂</span> Overview</a>
+    <a class="nav-link {% if request.endpoint == 'latest' %}active{% endif %}" href="{{ url_for('latest') }}"><span>◷</span> Latest News</a>
+    <a class="nav-link {% if request.endpoint == 'trending' %}active{% endif %}" href="{{ url_for('trending') }}"><span>↗</span> Trending</a>
+    <a class="nav-link {% if request.endpoint == 'bookmarks' %}active{% endif %}" href="{{ url_for('bookmarks') }}"><span>☆</span> Bookmarks</a>
+    <a class="nav-link {% if request.endpoint == 'history' %}active{% endif %}" href="{{ url_for('history') }}"><span>◴</span> Reading History</a>
+    <a class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}" href="{{ url_for('analytics') }}"><span>▥</span> News Analytics</a>
+    <a class="nav-link {% if request.endpoint == 'notifications' %}active{% endif %}" href="{{ url_for('notifications') }}"><span>♧</span> Notifications {% if load_notification_badge %}<i class="nav-count">{{ load_notification_badge }}</i>{% endif %}</a>
+    <div class="nav-label category-label">CATEGORIES</div>
+    {% for cat in ["Sports","Entertainment","Education","Technology","Business","Science","Health"] %}
+      <a class="nav-link category-link" href="{{ url_for('dashboard', category=cat) }}"><span class="category-dot dot-{{ cat|lower }}"></span>{{ cat }}</a>
+    {% endfor %}
+    <div class="sidebar-bottom">
+      <div class="sidebar-note"><strong>Stay informed.</strong><br><span>Stories that move your world.</span></div>
+      <a class="nav-link {% if request.endpoint == 'preferences' %}active{% endif %}" href="{{ url_for('preferences') }}"><span>⚙</span> Preferences</a>
+      <a class="nav-link" href="{{ url_for('logout') }}"><span>↪</span> Sign out</a>
+    </div>
+  </aside>
+  <main class="main-area">
+    <header class="topbar">
+      <div class="mobile-brand">News<span>Pulse</span></div>
+      <div class="topbar-left"><span class="eyebrow">DAILY BRIEFING</span><span class="topbar-date" id="todayDate"></span></div>
+      <div class="topbar-actions">
+        <button class="icon-button" id="themeToggle" type="button" title="Toggle light/dark mode" aria-label="Toggle theme"><span id="themeIcon">☾</span></button>
+        <a class="icon-button notification-top" href="{{ url_for('notifications') }}" title="Notifications" aria-label="Notifications">♧</a>
+        <div class="user-chip"><span class="avatar">U</span><span>{{ session.get('username','User') }}</span></div>
+      </div>
+    </header>
+    <section class="page-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </section>
+    <footer class="footer">NewsPulse Horizon <span>•</span> A student web-scraping project · Respect publisher access rules</footer>
+  </main>
+</div>
+{% else %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}
+  {% endwith %}
+  {% block public_content %}{% endblock %}
+{% endif %}
+<button class="back-to-top" id="backToTop" type="button" aria-label="Back to top">↑</button>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body></html>

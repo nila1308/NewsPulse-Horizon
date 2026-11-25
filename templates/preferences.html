@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Preferences · NewsPulse Horizon{% endblock %}
+{% block content %}
+<div class="page-intro"><div class="eyebrow">MAKE IT YOURS</div><h1>Preferences</h1><p class="muted">Choose a comfortable reading and display experience on this browser.</p></div>
+<div class="preferences-grid">
+ <section class="preference-card"><div class="preference-icon">◐</div><div><h2>Appearance</h2><p>Switch between the light and dark newsroom themes.</p></div><button class="outline-button" id="preferenceTheme" type="button">Toggle theme</button></section>
+ <section class="preference-card"><div class="preference-icon">Aa</div><div><h2>Reading comfort</h2><p>Adjust article text size. Your choice is saved in this browser.</p></div><div class="preference-controls"><button class="outline-button" id="prefFontDown" type="button">A−</button><span id="prefFontValue">16 px</span><button class="outline-button" id="prefFontUp" type="button">A+</button></div></section>
+ <section class="preference-card"><div class="preference-icon">⌁</div><div><h2>Motion</h2><p>Reduce interface animations if you prefer a calmer experience.</p></div><label class="switch-label"><input type="checkbox" id="reduceMotion"> Reduce motion</label></section>
+</div>
+{% endblock %}
+{% block scripts %}<script>(function(){const root=document.documentElement;document.getElementById('preferenceTheme')?.addEventListener('click',()=>document.getElementById('themeToggle')?.click());let size=Number(localStorage.getItem('newspulse-reader-size')||16);const value=document.getElementById('prefFontValue');function draw(){value.textContent=size+' px';localStorage.setItem('newspulse-reader-size',size)}draw();document.getElementById('prefFontUp')?.addEventListener('click',()=>{size=Math.min(22,size+1);draw()});document.getElementById('prefFontDown')?.addEventListener('click',()=>{size=Math.max(13,size-1);draw()});const box=document.getElementById('reduceMotion');box.checked=localStorage.getItem('newspulse-reduce-motion')==='1';function motion(){document.body.classList.toggle('reduce-motion',box.checked);localStorage.setItem('newspulse-reduce-motion',box.checked?'1':'0')}motion();box.addEventListener('change',motion)})();</script>{% endblock %}

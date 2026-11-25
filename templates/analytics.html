@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}News Analytics · NewsPulse Horizon{% endblock %}
+{% block content %}
+<div class="page-intro"><div class="eyebrow">YOUR NEWSROOM INSIGHTS</div><h1>News analytics</h1><p class="muted">A personal snapshot of your NewsPulse collection and reading activity.</p></div>
+<div class="stats-grid analytics-stats">
+  <div class="stat-card"><span class="stat-label">TOTAL STORIES</span><strong>{{ total }}</strong><small>Across seven categories</small></div>
+  <div class="stat-card"><span class="stat-label">BOOKMARKED</span><strong>{{ bookmarks }}</strong><small>Stories saved for later</small></div>
+  <div class="stat-card"><span class="stat-label">STORIES OPENED</span><strong>{{ views }}</strong><small>Reading visits recorded</small></div>
+  <div class="stat-card"><span class="stat-label">CATEGORIES</span><strong>{{ categories|length }}</strong><small>Topics in your newsroom</small></div>
+</div>
+<div class="analytics-layout">
+ <section class="analytics-card analytics-chart-card"><div><div class="eyebrow">NEWSROOM MIX</div><h2>Stories by category</h2></div><div class="chart-wrap"><canvas id="analyticsChart"></canvas></div></section>
+ <section class="analytics-card"><div><div class="eyebrow">YOUR READING HABITS</div><h2>Recently opened stories</h2></div>{% for item in most_viewed %}<a class="analytics-list-item" href="{{ url_for('article',article_key=item.id) }}"><span class="category-pill">{{ item.category }}</span><strong>{{ item.title }}</strong></a>{% else %}<p class="muted">Open a few stories to build your reading history.</p>{% endfor %}</section>
+ <section class="analytics-card"><div><div class="eyebrow">SAVED FOR LATER</div><h2>Bookmarked stories</h2></div>{% for item in most_saved %}<a class="analytics-list-item" href="{{ url_for('article',article_key=item.id) }}"><span class="category-pill">{{ item.category }}</span><strong>{{ item.title }}</strong></a>{% else %}<p class="muted">Your saved stories will appear here.</p>{% endfor %}</section>
+</div>
+{% endblock %}
+{% block scripts %}<script>const analyticsCounts={{ counts|tojson }};if(window.Chart&&document.getElementById('analyticsChart'))new Chart(document.getElementById('analyticsChart'),{type:'doughnut',data:{labels:Object.keys(analyticsCounts),datasets:[{data:Object.values(analyticsCounts),backgroundColor:['#087e83','#e8795b','#e2b65e','#6688a5','#8c79b5','#6b9b78','#c47e9a'],borderWidth:0}]},options:{cutout:'65%',plugins:{legend:{position:'bottom'}}}});</script>{% endblock %}

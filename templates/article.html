@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} · NewsPulse{% endblock %}
+{% block content %}
+<div class="reading-progress-track"><span id="readingProgress"></span></div>
+<div class="article-toolbar"><a href="{{ url_for('dashboard') }}" class="back-link">← Back to headlines</a><div class="reader-actions"><button class="outline-button" type="button" id="fontDecrease" aria-label="Decrease font size">A−</button><button class="outline-button" type="button" id="fontIncrease" aria-label="Increase font size">A+</button><button class="outline-button" type="button" id="shareArticle">↗ Share</button><form method="post" action="{{ url_for('bookmark', article_key=article.id) }}"><button class="outline-button" type="submit">☆ Save story</button></form></div></div>
+<article class="reader">
+  <div class="reader-kicker"><span class="category-pill">{{ article.category }}</span><span>{{ article.source }}</span></div>
+  <h1>{{ article.title }}</h1>
+  <div class="reader-meta">Published: {{ article.published or 'Date not provided' }} <span>·</span> {{ reading_minutes }} min read <span>·</span> Collected by NewsPulse</div>
+  {% if image %}<img class="reader-image" src="{{ image }}" alt="Article image" onerror="this.onerror=null;this.src='/static/images/image-unavailable.svg?v=20261125b';this.classList.add('placeholder')">{% endif %}
+  {% if content %}
+    <div class="reader-content">{% for paragraph in content %}{% if paragraph|length < 150 and paragraph == paragraph|upper %}<h2>{{ paragraph }}</h2>{% else %}<p>{{ paragraph }}</p>{% endif %}{% endfor %}</div>
+    <div class="reader-note">Original NewsPulse editorial explainer prepared for this demonstration edition. It is not copied from a publisher or presented as breaking news.</div>
+  {% elif article.external_only %}
+    <div class="unavailable-panel"><div class="unavailable-icon">↗</div><h2>Continue to the original publisher</h2><p>{{ message }}</p><p>NewsPulse provides the headline and a short preview here. The complete publisher article is available through the original website.</p></div>
+  {% else %}
+    <div class="unavailable-panel"><div class="unavailable-icon">↗</div><h2>Full article text is unavailable</h2><p>{{ message }}</p><p>You can still read the story on its original website.</p></div>
+  {% endif %}
+  {% if final_url %}<div class="source-panel"><div><span class="eyebrow">ORIGINAL PUBLISHER</span><strong>{{ article.source }}</strong><small>Open the publisher's page for the complete article.</small></div><a class="primary-button" href="{{ final_url }}" target="_blank" rel="noopener noreferrer">Read original article ↗</a></div>
+  {% else %}<div class="source-panel"><div><span class="eyebrow">NEWS PULSE EDITORIAL DESK</span><strong>Full explainer preloaded</strong><small>Original demonstration content; not verified breaking news.</small></div></div>{% endif %}
+  <nav class="article-nextprev" aria-label="Article navigation">
+    {% if previous_item %}<a href="{{ url_for('article', article_key=previous_item.id) }}"><small>← PREVIOUS STORY</small><strong>{{ previous_item.title }}</strong></a>{% else %}<span></span>{% endif %}
+    {% if next_item %}<a href="{{ url_for('article', article_key=next_item.id) }}"><small>NEXT STORY →</small><strong>{{ next_item.title }}</strong></a>{% endif %}
+  </nav>
+</article>
+{% endblock %}
+{% block scripts %}<script>
+(function(){const reader=document.querySelector('.reader');const bar=document.getElementById('readingProgress');function progress(){if(!reader||!bar)return;const r=reader.getBoundingClientRect();const total=reader.offsetHeight-window.innerHeight;const done=Math.max(0,Math.min(total,-r.top));bar.style.width=(total>0?done/total*100:100)+'%'}window.addEventListener('scroll',progress,{passive:true});progress();let size=Number(localStorage.getItem('newspulse-reader-size')||16);const body=document.querySelector('.reader-content');function setSize(){if(body)body.style.fontSize=size+'px';localStorage.setItem('newspulse-reader-size',size)}setSize();document.getElementById('fontIncrease')?.addEventListener('click',()=>{size=Math.min(22,size+1);setSize()});document.getElementById('fontDecrease')?.addEventListener('click',()=>{size=Math.max(13,size-1);setSize()});document.getElementById('shareArticle')?.addEventListener('click',async()=>{const data={title:document.title,text:document.querySelector('.reader h1')?.textContent,url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(location.href);alert('Article link copied.')}}catch(e){}})})();
+</script>{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Notifications · NewsPulse Horizon{% endblock %}
+{% block content %}
+<div class="page-intro"><div class="eyebrow">NEWSROOM ACTIVITY</div><h1>Notifications</h1><p class="muted">New stories discovered during your manual news refreshes appear here.</p></div>
+<section class="notification-list">{% for note in notifications %}<article class="notification-item"><span class="notification-mark">✦</span><div><span class="category-pill">{{ note.category }}</span><h3>{{ note.title }}</h3><p>{{ note.source }} · {{ note.created_at[:16].replace('T',' ') if note.created_at else 'Recently added' }}</p><a href="{{ note.url }}" target="_blank" rel="noopener noreferrer">Open publisher story →</a></div></article>{% else %}<div class="empty-state"><div class="empty-icon">♧</div><h3>You're all caught up</h3><p>When a refresh finds new stories, they'll be collected here.</p><a class="primary-button" href="{{ url_for('dashboard') }}">Back to overview</a></div>{% endfor %}</section>
+{% endblock %}
